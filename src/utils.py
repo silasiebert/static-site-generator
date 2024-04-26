@@ -19,13 +19,16 @@ def text_node_to_html_node(text_node: TextNode):
     if text_node.texttype == "code":
         return LeafNode(tag="code", value=text_node.text)
     if text_node.texttype == "link":
-        return LeafNode(tag="a", value=text_node.text, props={b"href":text_node.url})
+        return LeafNode(tag="a", value=text_node.text, props={b"href": text_node.url})
     if text_node.texttype == "image":
-        return LeafNode(tag="img", value=None, props={"src" : text_node.url, "alt" : text_node.text}) 
-    else: 
+        return LeafNode(
+            tag="img", value=None, props={"src": text_node.url, "alt": text_node.text}
+        )
+    else:
         raise Exception("invalid texttype")
 
-def split_nodes_delimiter(old_nodes:list[TextNode], delimiter, text_type):
+
+def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
     new_nodes = []
     old_node: TextNode
     for old_node in old_nodes:
@@ -36,14 +39,16 @@ def split_nodes_delimiter(old_nodes:list[TextNode], delimiter, text_type):
             word: str
             current_word_list = []
             current_text_type = text_type_text
-            has_closing_delimiter = True 
+            has_closing_delimiter = True
             for word in old_node.text.split():
                 if word.startswith(delimiter):
                     if len(current_word_list) != 0:
-                        current_segment = " ".join(current_word_list)  + " "
+                        current_segment = " ".join(current_word_list) + " "
                         if len(current_word_list) == 1:
-                            current_segment =" " + " ".join(current_word_list)  + " "
-                        new_textnode = TextNode(text=current_segment, texttype=current_text_type)
+                            current_segment = " " + " ".join(current_word_list) + " "
+                        new_textnode = TextNode(
+                            text=current_segment, texttype=current_text_type
+                        )
                         new_nodes.append(new_textnode)
                         current_word_list = []
                     word = word.removeprefix(delimiter)
@@ -51,7 +56,9 @@ def split_nodes_delimiter(old_nodes:list[TextNode], delimiter, text_type):
                     has_closing_delimiter = False
                 if word.endswith(delimiter):
                     current_word_list.append(word.removesuffix(delimiter))
-                    new_textnode = TextNode(text=" ".join(current_word_list), texttype=current_text_type)
+                    new_textnode = TextNode(
+                        text=" ".join(current_word_list), texttype=current_text_type
+                    )
                     new_nodes.append(new_textnode)
                     has_closing_delimiter = True
                     current_text_type = text_type_text
@@ -60,14 +67,35 @@ def split_nodes_delimiter(old_nodes:list[TextNode], delimiter, text_type):
                 if delimiter not in word:
                     current_word_list.append(word)
             if len(current_word_list) != 0:
-                new_textnode = TextNode(text=" " + " ".join(current_word_list), texttype=current_text_type)
+                new_textnode = TextNode(
+                    text=" " + " ".join(current_word_list), texttype=current_text_type
+                )
                 new_nodes.append(new_textnode)
                 current_word_list = []
 
             print(f"New nodes: {new_nodes}")
 
-
             if not has_closing_delimiter:
-                raise Exception(f"missing closing {delimiter}") 
-    return new_nodes 
+                raise Exception(f"missing closing {delimiter}")
+    return new_nodes
 
+
+def split_nodes_delimiter_v2(old_nodes: list[TextNode], delimiter, text_type):
+    old_node: TextNode
+    new_nodes = []
+    for old_node in old_nodes:
+        text_segments_list = old_node.text.split(delimiter)
+        if len(text_segments_list) % 2 == 0:
+            raise ValueError(
+                f"Invalid markdown syntax: Missing {delimiter} closing tag."
+            )
+        for i in range(0, len(text_segments_list)):
+            if text_segments_list[i] != "":
+                if i % 2 == 0:
+                    new_node = TextNode(
+                        text=text_segments_list[i], texttype=text_type_text
+                    )
+                else:
+                    new_node = TextNode(text=text_segments_list[i], texttype=text_type)
+                new_nodes.append(new_node)
+    return new_nodes
