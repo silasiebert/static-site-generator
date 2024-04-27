@@ -107,7 +107,7 @@ class TestUtils(unittest.TestCase):
                 "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png",
             ),
         ]
-        self.assertEqual(extract_markdown_images(text), expected_list)
+        self.assertListEqual(extract_markdown_images(text), expected_list)
 
     def test_extract_markdown_links(self):
         text = "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)"
@@ -115,7 +115,7 @@ class TestUtils(unittest.TestCase):
             ("link", "https://www.example.com"),
             ("another", "https://www.example.com/another"),
         ]
-        self.assertEqual(extract_markdown_links(text), expected_list)
+        self.assertListEqual(extract_markdown_links(text), expected_list)
 
     def test_extract_markdown_links_missing_bracket(self):
         text = "This is text with a [link(https://www.example.com) and [another](https://www.example.com/another)"
