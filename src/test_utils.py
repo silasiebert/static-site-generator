@@ -5,6 +5,8 @@ from utils import (
     split_nodes_delimiter_v2,
     text_node_to_html_node,
     split_nodes_delimiter,
+    extract_markdown_images,
+    extract_markdown_links,
 )
 
 
@@ -92,3 +94,47 @@ class TestUtils(unittest.TestCase):
         node = TextNode("This is a *normal sentence.", text_type_text)
         with self.assertRaises(ValueError):
             split_nodes_delimiter_v2([node], "*", text_type_bold)
+
+    def test_extract_markdown_images(self):
+        text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
+        expected_list = [
+            (
+                "image",
+                "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
+            ),
+            (
+                "another",
+                "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png",
+            ),
+        ]
+        self.assertEqual(extract_markdown_images(text), expected_list)
+
+    def test_extract_markdown_links(self):
+        text = "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)"
+        expected_list = [
+            ("link", "https://www.example.com"),
+            ("another", "https://www.example.com/another"),
+        ]
+        self.assertEqual(extract_markdown_links(text), expected_list)
+
+    def test_extract_markdown_links_missing_bracket(self):
+        text = "This is text with a [link(https://www.example.com) and [another](https://www.example.com/another)"
+        expected_list = [
+            ("link", "https://www.example.com"),
+            ("another", "https://www.example.com/another"),
+        ]
+        self.assertNotEqual(extract_markdown_links(text), expected_list)
+
+    def test_extract_markdown_images_missing_bracket(self):
+        text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and !another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
+        expected_list = [
+            (
+                "image",
+                "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
+            ),
+            (
+                "another",
+                "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png",
+            ),
+        ]
+        self.assertNotEqual(extract_markdown_images(text), expected_list)
