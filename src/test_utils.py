@@ -7,6 +7,7 @@ from utils import (
     split_nodes_delimiter,
     extract_markdown_images,
     extract_markdown_links,
+    split_nodes_image,
 )
 
 
@@ -138,3 +139,29 @@ class TestUtils(unittest.TestCase):
             ),
         ]
         self.assertNotEqual(extract_markdown_images(text), expected_list)
+
+    def test_split_nodes_image(self):
+        text_type_text = "text"
+        text_type_image = "image"
+
+        node = TextNode(
+            "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another ![second image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png)",
+            text_type_text,
+        )
+        new_nodes = split_nodes_image([node])
+        expected_nodes = [
+            TextNode("This is text with an ", text_type_text),
+            TextNode(
+                "image",
+                text_type_image,
+                "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
+            ),
+            TextNode(" and another ", text_type_text),
+            TextNode(
+                "second image",
+                text_type_image,
+                "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png",
+            ),
+        ]
+        print(new_nodes)
+        self.assertListEqual(new_nodes, expected_nodes)
