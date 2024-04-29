@@ -3,6 +3,7 @@ from textnode import TextNode
 from leafnode import LeafNode
 from utils import (
     split_nodes_delimiter_v2,
+    split_nodes_link,
     text_node_to_html_node,
     split_nodes_delimiter,
     extract_markdown_images,
@@ -143,7 +144,6 @@ class TestUtils(unittest.TestCase):
     def test_split_nodes_image(self):
         text_type_text = "text"
         text_type_image = "image"
-
         node = TextNode(
             "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another ![second image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png)",
             text_type_text,
@@ -163,5 +163,28 @@ class TestUtils(unittest.TestCase):
                 "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png",
             ),
         ]
-        print(new_nodes)
+        self.assertListEqual(new_nodes, expected_nodes)
+
+    def test_split_nodes_link(self):
+        text_type_text = "text"
+        text_type_link = "link"
+        node = TextNode(
+            "This is text with a [link thingy](https://boot.dev) and another [big search engine](https://www.google.com)",
+            text_type_text,
+        )
+        new_nodes = split_nodes_link([node])
+        expected_nodes = [
+            TextNode("This is text with a ", text_type_text),
+            TextNode(
+                "link thingy",
+                text_type_link,
+                "https://boot.dev",
+            ),
+            TextNode(" and another ", text_type_text),
+            TextNode(
+                "big search engine",
+                text_type_link,
+                "https://www.google.com",
+            ),
+        ]
         self.assertListEqual(new_nodes, expected_nodes)
