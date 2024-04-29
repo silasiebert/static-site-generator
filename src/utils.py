@@ -117,24 +117,29 @@ def split_nodes_image(old_nodes: list[TextNode]):
     new_nodes: list[TextNode]
     new_nodes = []
     for old_node in old_nodes:
+        if old_node.texttype != text_type_text:
+            new_nodes.append(old_node)
+            continue
         text: str
-        text = old_node.text
-        image_tups = extract_markdown_images(text)
+        image_tups = extract_markdown_images(old_node.text)
         if len(image_tups) > 0:
-            image_tup = image_tups[0]
-            text_segments = text.split(f"![{image_tup[0]}]({image_tup[1]})", 1)
-            if text_segments[0] != "":
+            text = old_node.text
+            for image_tup in image_tups:
+                text_segments = text.split(f"![{image_tup[0]}]({image_tup[1]})", 1)
+                if len(text_segments) != 2:
+                    raise ValueError("Invalid mardown syntax, image section not closed")
+                if text_segments[0] != "":
+                    new_nodes.append(
+                        TextNode(text=text_segments[0], texttype=text_type_text)
+                    )
                 new_nodes.append(
-                    TextNode(text=text_segments[0], texttype=text_type_text)
+                    TextNode(
+                        text=image_tup[0], texttype=text_type_image, url=image_tup[1]
+                    )
                 )
-            new_nodes.append(
-                TextNode(text=image_tup[0], texttype=text_type_image, url=image_tup[1])
-            )
-            if text_segments[1] != "":
-                new_nodes.append(
-                    TextNode(text=text_segments[1], texttype=text_type_text)
-                )
-            return split_nodes_image(new_nodes)
+                text = text_segments[1]
+            if text != "":
+                new_nodes.append(TextNode(text=text, texttype=text_type_text))
         else:
             new_nodes.append(old_node)
     return new_nodes
@@ -145,24 +150,29 @@ def split_nodes_link(old_nodes: list[TextNode]):
     new_nodes: list[TextNode]
     new_nodes = []
     for old_node in old_nodes:
+        if old_node.texttype != text_type_text:
+            new_nodes.append(old_node)
+            continue
         text: str
         text = old_node.text
         link_tups = extract_markdown_links(text)
         if len(link_tups) > 0:
-            link_tup = link_tups[0]
-            text_segments = text.split(f"[{link_tup[0]}]({link_tup[1]})", 1)
-            if text_segments[0] != "":
+            for link_tup in link_tups:
+                text_segments = text.split(f"[{link_tup[0]}]({link_tup[1]})", 1)
+                if len(text_segments) != 2:
+                    raise ValueError("Invalid markdown syntax, link section not closed")
+                if text_segments[0] != "":
+                    new_nodes.append(
+                        TextNode(text=text_segments[0], texttype=text_type_text)
+                    )
                 new_nodes.append(
-                    TextNode(text=text_segments[0], texttype=text_type_text)
+                    TextNode(text=link_tup[0], texttype=text_type_link, url=link_tup[1])
                 )
-            new_nodes.append(
-                TextNode(text=link_tup[0], texttype=text_type_link, url=link_tup[1])
-            )
-            if text_segments[1] != "":
+                text = text_segments[1]
+            if text != "":
                 new_nodes.append(
                     TextNode(text=text_segments[1], texttype=text_type_text)
                 )
-            return split_nodes_link(new_nodes)
         else:
             new_nodes.append(old_node)
     return new_nodes

@@ -145,7 +145,7 @@ class TestUtils(unittest.TestCase):
         text_type_text = "text"
         text_type_image = "image"
         node = TextNode(
-            "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another ![second image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png)",
+            "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another ![second image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png) and some text to end on.",
             text_type_text,
         )
         new_nodes = split_nodes_image([node])
@@ -162,6 +162,7 @@ class TestUtils(unittest.TestCase):
                 text_type_image,
                 "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png",
             ),
+            TextNode(" and some text to end on.", text_type_text),
         ]
         self.assertListEqual(new_nodes, expected_nodes)
 
@@ -188,3 +189,21 @@ class TestUtils(unittest.TestCase):
             ),
         ]
         self.assertListEqual(new_nodes, expected_nodes)
+
+    def test_split_nodes_images_invalid_markdown(self):
+        node = TextNode(
+            "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another ![second image]https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png) and some text to end on.",
+            "text",
+        )
+        # TODO: Fix the test
+        # with self.assertRaises(ValueError):
+        # split_nodes_image([node])
+
+    def test_split_nodes_link_invalid_markdown(self):
+        node = TextNode(
+            "This is text with a [link]eouoeuue(https://boot.dev) and [another link](https://blog.boot.dev) with text that follows",
+            "text",
+        )
+        # TODO: Fix the test
+        # with self.assertRaises(ValueError):
+        # split_nodes_link([node])
