@@ -1,6 +1,6 @@
 import unittest
 from textnode import TextNode
-from leafnode import LeafNode
+from htmlnode import LeafNode
 from utils import (
     split_nodes_delimiter_v2,
     split_nodes_link,

@@ -1,6 +1,6 @@
 import re
 from textnode import TextNode
-from leafnode import LeafNode
+from htmlnode import LeafNode
 
 text_type_text = "text"
 text_type_bold = "bold"

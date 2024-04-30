@@ -1,6 +1,6 @@
 import unittest
-from parentnode import ParentNode
-from leafnode import LeafNode
+from htmlnode import ParentNode, LeafNode
+
 
 class TestParentNode(unittest.TestCase):
     def test_to_html(self):
@@ -13,8 +13,10 @@ class TestParentNode(unittest.TestCase):
                 LeafNode(None, "Normal text"),
             ],
         )
-        expected_html = "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>" 
-        self.assertEqual(node.to_html(), expected_html) 
+        expected_html = (
+            "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>"
+        )
+        self.assertEqual(node.to_html(), expected_html)
 
     def test_nested(self):
         nested_node = ParentNode(
@@ -27,7 +29,6 @@ class TestParentNode(unittest.TestCase):
             ],
         )
 
-        
         node = ParentNode(
             "p",
             [
@@ -38,9 +39,8 @@ class TestParentNode(unittest.TestCase):
             ],
         )
 
-        
-        expected_html = "<p><b>Bold text</b><p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p><i>italic text</i>Normal text</p>" 
-        self.assertEqual(node.to_html(), expected_html) 
+        expected_html = "<p><b>Bold text</b><p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p><i>italic text</i>Normal text</p>"
+        self.assertEqual(node.to_html(), expected_html)
 
     def test_no_tag(self):
         with self.assertRaises(ValueError):
@@ -54,12 +54,11 @@ class TestParentNode(unittest.TestCase):
             )
             node.to_html()
 
-
     def test_no_children(self):
         with self.assertRaises(ValueError):
             node = ParentNode("p", None)
             node.to_html()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
