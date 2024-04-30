@@ -47,16 +47,19 @@ class TestTextNode(unittest.TestCase):
         self.maxDiff = None
         self.assertListEqual(text_nodes, expected_textnodes)
 
-    def test_text_to_textnode2(self):
-        text = "This is *text with an italic* word, a bold **word** and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
+    def test_text_to_textnodemarkdown_symbols_within_code_blocks(self):
+        text = "This is **text** with an *italic* word and a `code block that contains **bold** and *italic* and even an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png)` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
         text_nodes = text_to_textnodes(text)
         expected_textnodes = [
             TextNode("This is ", text_type_text),
-            TextNode("text with an italic", text_type_italic),
-            TextNode(" word, a bold ", text_type_text),
-            TextNode("word", text_type_bold),
-            TextNode(" and a ", text_type_text),
-            TextNode("code block", text_type_code),
+            TextNode("text", text_type_bold),
+            TextNode(" with an ", text_type_text),
+            TextNode("italic", text_type_italic),
+            TextNode(" word and a ", text_type_text),
+            TextNode(
+                "code block that contains **bold** and *italic* and even an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png)",
+                text_type_code,
+            ),
             TextNode(" and an ", text_type_text),
             TextNode(
                 "image",

@@ -180,12 +180,11 @@ def split_nodes_link(old_nodes: list[TextNode]):
 
 def text_to_textnodes(text):
     root_node = TextNode(text, text_type_text)
-    bold_nodes_split = split_nodes_delimiter_v2([root_node], "**", text_type_bold)
-    print(bold_nodes_split)
+    code_nodes_split = split_nodes_delimiter_v2([root_node], "`", text_type_code)
+    bold_nodes_split = split_nodes_delimiter_v2(code_nodes_split, "**", text_type_bold)
     italic_nodes_split = split_nodes_delimiter_v2(
         bold_nodes_split, "*", text_type_italic
     )
-    code_nodes_split = split_nodes_delimiter_v2(italic_nodes_split, "`", text_type_code)
-    image_nodes_split = split_nodes_image(code_nodes_split)
+    image_nodes_split = split_nodes_image(italic_nodes_split)
     link_nodes_split = split_nodes_link(image_nodes_split)
     return link_nodes_split
