@@ -20,3 +20,14 @@ def text_node_to_html_node(text_node: TextNode):
         )
     else:
         raise Exception("invalid texttype")
+
+
+def markdown_to_blocks(markdown):
+    blocks = markdown.split("\n\n")
+    print(blocks)
+    clean_blocks = map(lambda string: string.strip(" \n"), blocks)
+    print(clean_blocks)
+    non_empty_blocks = filter(lambda block: block != "", clean_blocks)
+    block_list = list(non_empty_blocks)
+    print(block_list)
+    return block_list
