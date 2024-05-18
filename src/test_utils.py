@@ -1,5 +1,5 @@
 import unittest
-from htmlnode import LeafNode
+from htmlnode import LeafNode, text_node_to_html_node
 from textnode import (
     TextNode,
     split_nodes_delimiter_v2,
@@ -9,7 +9,10 @@ from textnode import (
     extract_markdown_links,
     split_nodes_image,
 )
-from utils import markdown_to_blocks, text_node_to_html_node
+from markdown_blocks import (
+    block_to_block_type,
+    markdown_to_blocks,
+)
 
 
 class TestUtils(unittest.TestCase):
@@ -254,3 +257,69 @@ This is the same paragraph on a new line
         ]
         blocks = markdown_to_blocks(markdown)
         self.assertListEqual(blocks, expected_blocks)
+
+    def test_block_to_block_type_heading(self):
+        block_type = block_to_block_type("#### This is a heading block")
+        expected_block_type = "heading"
+        self.assertEqual(block_type, expected_block_type)
+
+    def test_block_to_block_type_invalid_heading(self):
+        block_type = block_to_block_type("######## This is a heading block")
+        expected_block_type = "heading"
+        self.assertNotEqual(block_type, expected_block_type)
+
+    def test_block_to_block_type_code(self):
+        block_type = block_to_block_type("``` This is a code block ```")
+        expected_block_type = "code"
+        self.assertEqual(block_type, expected_block_type)
+
+    def test_block_to_block_type_quote(self):
+        block_type = block_to_block_type(
+            """>This is a quote block
+>And another line of a quote"""
+        )
+        expected_block_type = "quote"
+        self.assertEqual(block_type, expected_block_type)
+
+    def test_block_to_block_type_invalid_quote(self):
+        block_type = block_to_block_type(
+            """>This is a quote block
+>And another line of a quote
+            This line does not have a >"""
+        )
+        expected_block_type = "quote"
+        self.assertNotEqual(block_type, expected_block_type)
+
+    def test_block_to_block_type_unordered_list(self):
+        block_type = block_to_block_type(
+            """- This is a quote block
+* And another line of a quote"""
+        )
+        expected_block_type = "unordered list"
+        self.assertEqual(block_type, expected_block_type)
+
+    def test_block_to_block_type_unordered_list_2(self):
+        block_type = block_to_block_type("""- This is the first line
+* this is the second line""")
+        expected_block_type = "unordered list"
+        self.assertEqual(block_type, expected_block_type)
+
+    def test_block_to_block_type_ordered_list(self):
+        block_type = block_to_block_type(
+            """1. This is a quote block
+2. And another line of a quote
+3. And another line of a quote
+4. And another line of a quote"""
+        )
+        expected_block_type = "ordered list"
+        self.assertEqual(block_type, expected_block_type)
+
+    def test_block_to_block_type_ordered_list_invalid(self):
+        block_type = block_to_block_type(
+            """1. This is a quote block
+2. And another line of a quote
+5. And another line of a quote
+4. And another line of a quote"""
+        )
+        expected_block_type = "ordered list"
+        self.assertNotEqual(block_type, expected_block_type)
