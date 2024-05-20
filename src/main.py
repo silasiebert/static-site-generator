@@ -11,8 +11,10 @@ def main():
 
 
 def copy_directory(source_directory, target_directory):
-    shutil.rmtree(target_directory)
-    os.mkdir(target_directory)
+    if os.path.exists(target_directory):
+        shutil.rmtree(target_directory)
+    if not os.path.exists(target_directory):
+        os.mkdir(target_directory)
     # Validate paths
     if not os.path.exists(source_directory):
         raise Exception("Invalid source directory")
